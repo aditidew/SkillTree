@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌳 SkillTree - Track Your Learning</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background-color: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #1976d2;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      background: #f1f8ff;
+      margin-bottom: 15px;
+      padding: 16px;
+      border-left: 6px solid #2196f3;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    li strong {
+      font-size: 1.2rem;
+      color: #0d47a1;
+    }
+
+    .delete-btn {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      background-color: #e53935;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .delete-btn:hover {
+      background-color: #c62828;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 SkillTree</h1>
+
+    <form id="skillForm">
+      <input id="name" type="text" placeholder="Skill Name" required />
+      <input id="description" type="text" placeholder="Short Description" />
+      <input id="level" type="number" placeholder="Skill Level (0–100)" min="0" max="100" />
+      <button type="submit">➕ Add Skill</button>
+    </form>
+
+    <ul id="skillList"></ul>
+  </div>
+
+  <script>
+    const API = '/api/skills';
+    const form = document.getElementById('skillForm');
+    const list = document.getElementById('skillList');
+
+    async function loadSkills() {
+      const res = await fetch(API);
+      const data = await res.json();
+      list.innerHTML = '';
+      data.forEach(skill => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${skill.name}</strong> (${skill.level}%)
+          <br><small>${skill.description || ''}</small>
+          ${skill.prerequisiteSkill ? `<br><em>Prerequisite: ${skill.prerequisiteSkill.name}</em>` : ''}
+          <button class="delete-btn" onclick="deleteSkill('${skill._id}')">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function deleteSkill(id) {
+      await fetch(`${API}/${id}`, { method: 'DELETE' });
+      loadSkills();
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const skill = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        level: parseInt(document.getElementById('level').value || '0')
+      };
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(skill)
+      });
+      form.reset();
+      loadSkills();
+    });
+
+    loadSkills();
+  </script>
+</body>
+</html>
