@@ -1,101 +1,99 @@
-# SkillTree
 
-SkillTree is a project that helps you track your skills and how they are connected. You can add skills, set their levels, and define which skills should be learned before others.
+SkillTree is a backend API built using Node.js and MongoDB to help track and manage personal skills. It allows users to add skills, define their levels, and optionally link them with prerequisite skills to form a learning path.
 
-## What it does
+## Features
 
-- Lets you add new skills with a description and level
-- Allows you to link skills as prerequisites
-- Shows a list of all skills with details
-- Works as a backend API (you can connect it with a frontend later)
+- Add new skills with descriptions and levels
+- Link skills with prerequisites
+- Fetch all skills with their prerequisite relationships
+- Organized and scalable structure for easy extension
 
-## Built with
+## Technologies Used
 
-- Node.js and Express.js for the backend server
-- MongoDB and Mongoose for the database
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
 
-## Folder structure
+## Project Structure
 
-skilltree-api/
+SkillTree/
 ├── models/ # Mongoose schema for skills
-├── routes/ # API routes
-├── utils/ # Utility functions
-├── server.js # Main server file
-├── .gitignore
-├── README.md
+├── routes/ # API route definitions
+├── utils/ # Helper functions
+├── server.js # Entry point of the server
+├── .gitignore # Files and folders to ignore in Git
+└── README.md # Project documentation
 
 bash
 Copy
 Edit
 
-## How to run the project
+## Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+
+- Node.js and npm installed
+- MongoDB running locally or connection string for Atlas
+
+### Installation
+
+1. Clone the repository
 
 ```bash
 git clone https://github.com/aditidew/SkillTree.git
-cd skilltree-api
-2. Install dependencies
+cd SkillTree
+Install dependencies
+
 bash
 Copy
 Edit
 npm install
-3. Set up the environment file
-Create a .env file in the root folder and add:
+Set up environment variables
+
+Create a .env file and add your MongoDB URI:
 
 bash
 Copy
 Edit
 MONGO_URI=mongodb://localhost:27017/skilltree
-Or replace it with your MongoDB connection string.
+Start the server
 
-4. Start the server
 bash
 Copy
 Edit
 npm start
-The API will be available at http://localhost:3000.
+The API will run at http://localhost:3000.
 
-API usage
-Get all skills
+API Endpoints
+Get All Skills
 bash
 Copy
 Edit
 GET /api/skills
-Add a new skill
+Add a Skill
 bash
 Copy
 Edit
 POST /api/skills
-Example request body:
+Request body example:
 
 json
 Copy
 Edit
 {
   "name": "JavaScript",
-  "description": "Basic language for web development",
+  "description": "A popular scripting language for web development",
   "level": 1,
-  "prerequisiteSkill": "skill_id_here (optional)"
+  "prerequisiteSkill": "<optional_skill_id>"
 }
-Future features
-A web interface to view and manage your skill tree
+Future Improvements
+User authentication and multi-user skill tracking
 
-Login and user-specific skills
+Frontend dashboard to visualize skill trees
 
-Smart suggestions for what to learn next
+Progress tracking and learning suggestions
 
 Author
 Aditi Dewangan
-GitHub: https://github.com/aditidew
-
-License
-This project is licensed under the MIT License.
-
-yaml
-Copy
-Edit
-
----
-
-You can now copy this into a file named `README.md` inside your `skilltree-api` folder and commit i
+GitHub
