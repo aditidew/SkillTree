@@ -29,3 +29,14 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+router.post('/', async (req, res) => {
+  try {
+    const { name, level } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name is required' });
+    const skill = await Skill.create(req.body);
+    res.status(201).json(skill);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

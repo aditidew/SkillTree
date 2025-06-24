@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🌳 SkillTree - Track Your Learning</title>
   <style>
     * {
@@ -27,7 +27,12 @@
     h1 {
       text-align: center;
       color: #1976d2;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      color: #333;
     }
 
     form {
@@ -38,8 +43,7 @@
     }
 
     input[type="text"],
-    input[type="number"],
-    textarea {
+    input[type="number"] {
       padding: 12px;
       font-size: 1rem;
       border: 1px solid #ccc;
@@ -80,27 +84,41 @@
       color: #0d47a1;
     }
 
-    .delete-btn {
+    .delete-btn,
+    .edit-btn {
       position: absolute;
-      right: 16px;
       top: 16px;
-      background-color: #e53935;
+      padding: 6px 10px;
       border: none;
       color: white;
-      padding: 6px 10px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
     }
 
+    .delete-btn {
+      right: 16px;
+      background-color: #e53935;
+    }
+
     .delete-btn:hover {
       background-color: #c62828;
+    }
+
+    .edit-btn {
+      right: 90px;
+      background-color: #43a047;
+    }
+
+    .edit-btn:hover {
+      background-color: #2e7d32;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🧠 SkillTree</h1>
+    <h2 id="formTitle">Add a New Skill</h2>
 
     <form id="skillForm">
       <input id="name" type="text" placeholder="Skill Name" required />
@@ -116,6 +134,18 @@
     const API = '/api/skills';
     const form = document.getElementById('skillForm');
     const list = document.getElementById('skillList');
+    const formTitle = document.getElementById('formTitle');
+
+    let editMode = false;
+    let currentEditingId = null;
+
+    function escapeHTML(str) {
+      return str.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+    }
 
     async function loadSkills() {
       const res = await fetch(API);
@@ -124,9 +154,10 @@
       data.forEach(skill => {
         const li = document.createElement('li');
         li.innerHTML = `
-          <strong>${skill.name}</strong> (${skill.level}%)
-          <br><small>${skill.description || ''}</small>
-          ${skill.prerequisiteSkill ? `<br><em>Prerequisite: ${skill.prerequisiteSkill.name}</em>` : ''}
+          <strong>${escapeHTML(skill.name)}</strong> (${skill.level || 0}%)
+          <br><small>${escapeHTML(skill.description || '')}</small>
+          ${skill.prerequisiteSkill ? `<br><em>Prerequisite: ${escapeHTML(skill.prerequisiteSkill.name)}</em>` : ''}
+          <button class="edit-btn" onclick="editSkill('${skill._id}', \`${escapeHTML(skill.name)}\`, \`${escapeHTML(skill.description || '')}\`, ${skill.level})">Edit</button>
           <button class="delete-btn" onclick="deleteSkill('${skill._id}')">Delete</button>
         `;
         list.appendChild(li);
@@ -134,8 +165,22 @@
     }
 
     async function deleteSkill(id) {
+      const confirmDelete = confirm("Are you sure you want to delete this skill?");
+      if (!confirmDelete) return;
+
       await fetch(`${API}/${id}`, { method: 'DELETE' });
       loadSkills();
+    }
+
+    function editSkill(id, name, description, level) {
+      document.getElementById('name').value = name;
+      document.getElementById('description').value = description;
+      document.getElementById('level').value = level;
+
+      currentEditingId = id;
+      editMode = true;
+      form.querySelector('button').textContent = '✏️ Update Skill';
+      formTitle.textContent = 'Edit Skill';
     }
 
     form.addEventListener('submit', async (e) => {
@@ -145,16 +190,30 @@
         description: document.getElementById('description').value,
         level: parseInt(document.getElementById('level').value || '0')
       };
-      await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(skill)
-      });
+
+      if (editMode) {
+        await fetch(`${API}/${currentEditingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(skill)
+        });
+        editMode = false;
+        currentEditingId = null;
+        form.querySelector('button').textContent = '➕ Add Skill';
+        formTitle.textContent = 'Add a New Skill';
+      } else {
+        await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(skill)
+        });
+      }
+
       form.reset();
       loadSkills();
     });
 
     loadSkills();
-  </script>
+  </script>clear
 </body>
 </html>
