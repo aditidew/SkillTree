@@ -40,3 +40,17 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * @swagger
+ * /skills:
+ *   get:
+ *     summary: Get all skills
+ *     responses:
+ *       200:
+ *         description: List of skills
+ */
+router.get('/', async (req, res) => {
+  const skills = await Skill.find().populate('prerequisiteSkill');
+  res.json(skills);
+});

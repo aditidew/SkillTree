@@ -31,3 +31,27 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 module.exports = app;
+
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'SkillTree API',
+      version: '1.0.0',
+      description: 'API for managing skills, dependencies and levels',
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000', // Adjust if your port is different
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], // Adjust this path to where you define routes
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
