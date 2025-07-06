@@ -1,0 +1,114 @@
+Please generate GoogleTest unit tests for this C++ SkillTree project.  
+Follow these strict YAML instructions:
+
+instructions:
+  - Use GoogleTest framework
+  - Create separate test files for SkillTree and SkillNode
+  - Include necessary headers (e.g., <gtest/gtest.h>, SkillTree.h, SkillNode.h)
+  - No duplicate test cases
+  - Cover functional correctness + edge cases
+  - Format cleanly, no explanations or comments
+  - File naming: tests/SkillTree_test.cpp, tests/SkillNode_test.cpp
+
+
+Here is the C++ code:
+
+SkillTree.h:
+
+#ifndef SKILLTREE_H
+#define SKILLTREE_H
+
+#include "SkillNode.h"
+#include <string>
+
+class SkillTree {
+private:
+    SkillNode* root;
+public:
+    SkillTree(std::string rootName);
+    ~SkillTree();
+    void addSkill(std::string parentName, std::string skillName);
+    bool hasSkill(std::string skillName);
+};
+
+#endif
+
+
+SkillTree.cpp:
+#include "SkillTree.h"
+#include <iostream>
+
+SkillTree::SkillTree(std::string rootName) {
+    root = new SkillNode(rootName);
+}
+
+SkillTree::~SkillTree() {
+    delete root;
+}
+
+void SkillTree::addSkill(std::string parentName, std::string skillName) {
+    SkillNode* parent = root->findNode(parentName);
+    if (parent) {
+        parent->addChild(new SkillNode(skillName));
+    }
+}
+
+bool SkillTree::hasSkill(std::string skillName) {
+    return root->findNode(skillName) != nullptr;
+}
+
+
+
+SkillNode.h:
+#ifndef SKILLNODE_H
+#define SKILLNODE_H
+
+#include <string>
+#include <vector>
+
+class SkillNode {
+private:
+    std::string name;
+    std::vector<SkillNode*> children;
+public:
+    SkillNode(std::string name);
+    ~SkillNode();
+    void addChild(SkillNode* child);
+    SkillNode* findNode(std::string nodeName);
+    std::string getName() const;
+};
+
+#endif
+
+
+SkillNode.cpp:
+#include "SkillNode.h"
+
+SkillNode::SkillNode(std::string name) : name(name) {}
+
+SkillNode::~SkillNode() {
+    for (auto child : children) {
+        delete child;
+    }
+}
+
+void SkillNode::addChild(SkillNode* child) {
+    children.push_back(child);
+}
+
+SkillNode* SkillNode::findNode(std::string nodeName) {
+    if (name == nodeName) return this;
+    for (auto child : children) {
+        SkillNode* result = child->findNode(nodeName);
+        if (result) return result;
+    }
+    return nullptr;
+}
+
+std::string SkillNode::getName() const {
+    return name;
+}
+
+
+
+

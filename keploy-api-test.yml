@@ -1,0 +1,42 @@
+name: API Testing with Keploy
+
+on:
+  push:
+    branches:
+      - main  # or your branch name
+  pull_request:
+
+jobs:
+  keploy-api-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build your app container
+      run: docker build -t skilltree-api .
+
+    - name: Run your app container
+      run: docker run -d --name skilltree -p 5000:5000 skilltree-api
+
+    - name: Pull Keploy image
+      run: docker pull keploy/keployd:latest
+
+    - name: Run Keploy test
+      run: |
+        docker run --rm \
+        --name keploy \
+        --network container:skilltree \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v ${{ github.workspace }}:/app \
+        keploy/keployd:latest test --container-name skilltree
+
+    - name: Upload Keploy test reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: keploy-test-reports
+        path: keploy/testReports
